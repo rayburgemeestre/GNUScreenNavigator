@@ -15,8 +15,7 @@ File::File(string nfileName)
 Json::Value File::toJson() 
 {
 	Json::Value root;
-	root["type"] = Json::Value("File");
-	root["name"] = Json::Value(getFileName());
+	root["file"] = Json::Value(getFileName());
 
 	return root;
 };

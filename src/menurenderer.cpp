@@ -42,7 +42,7 @@ MenuRenderer::MenuRenderer()
 
 void MenuRenderer::setMenuName(string menuName)
 {
-	menuName_ = menuName_;
+	menuName_ = menuName;
 }
 
 void MenuRenderer::resetMenuItems()
@@ -193,7 +193,7 @@ void MenuRenderer::initWindow()
 void MenuRenderer::drawInformationText()
 {
 	/* Post the menu */
-	mvprintw(0, 0, "Launcher v1.0-beta 2007 - http://ray.burgemeestre.net");
+	mvprintw(0, 0, "Launcher version-1.1 2007,2011 - http://ray.blog.burgemeestre.net");
 	mvprintw(LINES - 3, 0, "NAVIGATE using arrow- or vim- keys {h,j,k,l}");
 	mvprintw(LINES - 2, 0, "SELECT ITEM using <Enter> key or directly using shortcut keys {a,b,c,...}");
 	mvprintw(LINES - 1, 0, "EXIT program using <Control+C>");

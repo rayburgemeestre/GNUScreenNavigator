@@ -90,12 +90,9 @@ Json::Value MenuEngine::toJson()
 {
 	Json::Value root;
 
-	for (
-		menuIterator = menus.begin(); 
-		menuIterator != menus.end(); 
-		menuIterator++
-	) {
-		root[menuIterator->first] = (menuIterator->second).toJson();
+	int num = 0;
+	for (menuIterator = menus.begin(); menuIterator != menus.end(); ++menuIterator) {
+		root[num++] = (menuIterator->second).toJson();
 	}
 
 	return root;

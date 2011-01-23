@@ -13,7 +13,6 @@
 
 using namespace std;
 
-
 string get_config()
 {
     ifstream::pos_type size;
@@ -47,10 +46,10 @@ string get_config()
 #include "widgets/file.h"
 #include "widgets/dir.h"
 #include "menuengine.h"
+#include "myjson.h"
 
 int main(int argc, char *argv[])
 {
-
 	MenuEngine engine;
 
 	// read json
@@ -63,63 +62,41 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	// Get the value of the member of root named 'encoding', return 'UTF-8' if there is no
-	// such member.
-	//std::string encoding = root.get("encoding", "UTF-8" ).asString();
-	// Get the value of the member of root named 'encoding', return a 'null' value if
-	// there is no such member.
-	//const Json::Value plugins = root["plug-ins"];
-	cout << "root size: " << root.size() << endl;
-	for (unsigned int index = 0; index < root.size(); ++index ) {  // Iterates over the sequence elements.
-		// Todo: use iterator here as well (obsoletes this stupid int->string conversion)
-		char szIndex[64] = "";
-		sprintf(szIndex, "%d", index);
-		if (root[szIndex]["type"].asString().compare("Menu") == 0) {
-			cout << "MENU!" << endl;
-			Menu m(root[szIndex]["name"].asString());
-			Json::Value items = root[szIndex]["items"];
-			Json::Value::iterator iter;
+	// build menu from json
+	for (unsigned int i=0; i<root.size(); ++i) {
+		if (root[i].getMemberNames().empty())
+			continue;
+		string menuName = root[i].getMemberNames()[0];
+		Menu m(menuName);
 
-			Json::Value::Members members( items.getMemberNames() );
-			std::sort( members.begin(), members.end() );
-			//std::string suffix = *(path.end()-1) == '.' ? "" : ".";
-			for ( Json::Value::Members::iterator it = members.begin();
-				  it != members.end();
-				  ++it )
-			{
-				const std::string &name = *it;
-				//printValueTree( fout, value[name], path + suffix + name );
-				cout << "found: " << name << endl;
-				cout << "found: " << items[name]["type"].asString() << endl;
-				cout << "found: " << items[name]["name"].asString() << endl;
-				if (items[name]["type"].asString().compare("File") == 0) {
-					m.addItem(new File(items[name]["name"].asString()));
-				}
-				else if (items[name]["type"].asString().compare("Dir") == 0) {
-					m.addItem(new Dir(items[name]["name"].asString()));
-				}
+		Json::Value &menuItems = root[i][menuName];
+		for (unsigned int j=0; j<menuItems.size(); ++j) {
+			if (menuItems[j].getMemberNames().empty())
+				continue;
+			string type = menuItems[j].getMemberNames()[0];
+			string param = menuItems[j][type].asString();
+			if (type.compare("file") == 0) {
+				m.addItem(new File(param));
+			} else if (type.compare("dir") == 0) {
+				m.addItem(new Dir(param));
 			}
-			engine.addMenu(m);
 		}
+		engine.addMenu(m);
 	}
 
-	//root["encoding"] = "overruled";
-	//root["encoding2"] = new Json::Value;
-
-	Json::Value root2 = engine.toJson()	;
-
-	Json::StyledWriter writer;
-	// Make a new JSON document for the configuration. Preserve original comments.
-	std::string outputConfig = writer.write( root2 );
+	// create json text
+	Json::Value root2 = engine.toJson();
+	Json::MyStyledWriter writer;
+	std::string outputConfig = writer.write(root2);
 	cout << " output config: \n\n" << outputConfig << endl;
 
+	// save json
 	ofstream myfile;
 	stringstream ss;
 	ss << getenv("HOME") << "/.launcher";
 	myfile.open (ss.str().c_str(), ios::out |  ios::trunc);
 	if (myfile.is_open()) {
 		myfile << outputConfig << endl;
-
 		myfile.close();
 	} else {
 		cout << "Failure writing config" << endl;
@@ -127,6 +104,5 @@ int main(int argc, char *argv[])
 	}
 
 	engine.Run();
-	
 	return 0;
 }

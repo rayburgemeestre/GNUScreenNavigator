@@ -85,21 +85,12 @@ map <string, string> Menu::getItems()
 Json::Value Menu::toJson() 
 {
 	Json::Value root;
-
 	Json::Value menu;
-
-	for (
-		itemIterator = items.begin(); 
-		itemIterator != items.end(); 
-		itemIterator++
-	) {
-		menu[itemIterator->first] = ((itemIterator->second).get())->toJson();
+	int num = 0;
+	for (itemIterator = items.begin(); itemIterator != items.end(); ++itemIterator) {
+		menu[num++] = ((itemIterator->second).get())->toJson();
 	}
-
-	root["type"] = Json::Value("Menu");
-	root["name"] = Json::Value(getName());
-	root["items"] = menu;
-
+	root[getName()] = menu;
 	return root; 
 	
 };

@@ -3,6 +3,7 @@ CFLAGS	= -O2 -g -Wall -funsigned-char -I lib/jsoncpp-src-0.5.0/include/
 LFLAGS	= -lm -L lib/jsoncpp-src-0.5.0/libs/ -ljson -lncurses -lmenu
 OBJ		= widgets.o \
 			launcher.o\
+			myjson.o\
 			menurenderer.o\
 			abstractengine.o\
 			menuengine.o\
@@ -46,6 +47,9 @@ menu.o:		src/widgets/menu.cpp
 
 widgets.o:		src/widgets.cpp
 	$(CC) $(CFLAGS) -c src/widgets.cpp
+
+myjson.o:		src/myjson.cpp
+	$(CC) $(CFLAGS) -c src/myjson.cpp
 
 launcher.o:		src/launcher.cpp
 	$(CC) $(CFLAGS) -c src/launcher.cpp

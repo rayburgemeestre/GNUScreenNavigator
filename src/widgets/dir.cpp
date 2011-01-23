@@ -27,8 +27,7 @@ Dir::Dir(string ndirectoryName)
 Json::Value Dir::toJson() 
 {
 	Json::Value root;
-	root["type"] = Json::Value("Dir");
-	root["name"] = Json::Value(getDirectoryName());
+	root["dir"] = Json::Value(getDirectoryName());
 
 	return root;
 };

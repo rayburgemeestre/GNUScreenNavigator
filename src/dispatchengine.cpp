@@ -33,9 +33,6 @@ void DispatchEngine::Run()
 	menuRenderer_->addMenuItem("p", "pico editor in new screen window");
 	menuRenderer_->addMenuItem("c", "cat, show file contents, exit on keypress");
 	menuRenderer_->addMenuItem("x", "urxvt + vim + desert256 outside non256color screen in windows using xming");
-	menuRenderer_->addMenuItem("m", "sendmail to ray@grecom.nl");
-	menuRenderer_->addMenuItem("n", "sendmail to marijn@grecom.nl");
-	menuRenderer_->addMenuItem("o", "sendmail to trigen_@hotmail.com");
 
 	menuRenderer_->Render();
 }
@@ -56,40 +53,22 @@ void DispatchEngine::onItemSelect(string item)
 	if (item == "v") {
 		editorName = "vim";
 		editorParams = "-T xterm-256color";
-	}
-    else if (item == "s") {
+	} else if (item == "s") {
 		editorName = "sudo vim";
 		editorParams = "-T xterm-256color";
-	}
-    else if (item == "t") {
+	} else if (item == "t") {
 		editorName = "tail";
 		editorParams = "-f";
-	}
-	else if (item == "p") {
+	} else if (item == "p") {
 		editorName = "pico";
 		editorParams = "";
-	}
-	else if (item == "c") {
+	} else if (item == "c") {
 		editorName = "cat";
 		editorParams = "";
-	}
-    else if (item == "x") {
+	} else if (item == "x") {
         editorName = "urxvt";
         editorParams = "-e vim";
-    }
-    else if (item == "m") {
-        editorName = "sendFileTo.sh";
-        editorParams = "  ray@grecom.nl";
-    }
-    else if (item == "n") {
-        editorName = "sendFileTo.sh";
-        editorParams = " marijn@grecom.nl";
-    }
-    else if (item == "o") {
-        editorName = "sendFileTo.sh";
-        editorParams = " trigen_@hotmail.com";
-    }
-	else {
+    } else {
 		return;
 	}
 
@@ -108,7 +87,7 @@ void DispatchEngine::onItemSelect(string item)
 	myfile << "cd " << directoryName << " && ";
 	myfile << editorName + " " + editorParams + " " << fileName << "\n";
 	myfile.close();
-	// Chmod script
+	// chmod script
 	system("chmod +x /tmp/edit.sh");
 
 	string cmd = "screen -t " + bufferName + " /tmp/edit.sh ";
@@ -118,23 +97,11 @@ void DispatchEngine::onItemSelect(string item)
 
 void DispatchEngine::onMenuKeyPress(string key, string &selected)
 {
-	if (key == "v" || 
-		key == "p" ||
-		key == "c" ||
-		key == "t" ||
-		key == "s" ||
-		key == "x" ||
-		key == "m" ||
-		key == "n" ||
-		key == "o"
+	if (key == "v" || key == "p" || key == "c" || key == "t" ||
+		key == "s" || key == "x"
 	) {
 		selected = key;
-
-	}
-	else { 
+	} else { 
 		selected = "";
 	}
 }
-
-
-
