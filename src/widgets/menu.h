@@ -1,11 +1,17 @@
 #ifndef __MENU_H__
 #define  __MENU_H__
 
-#include "CObjectMap.h"
-#include "widgets.h"
+#include <map>
+#include <tr1/memory>
 
-typedef CObjectMap<string, Widget> ItemsMap;
-typedef ItemsMap::ObjectMapI ItemsMapI;
+#include "../widget.h"
+using namespace std::tr1;
+
+class Widget;
+
+typedef shared_ptr<Widget> WidgetPtr;
+typedef map<string, WidgetPtr > ItemsMap;
+typedef ItemsMap::iterator ItemsMapI;
 
 class Menu : public Widget
 {
