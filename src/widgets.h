@@ -1,81 +1,25 @@
-#ifndef __WIDGETS_H
-#define __WIDGETS_H
+#ifndef __WIDGETS_H__
+#define __WIDGETS_H__
 #include <string>
 #include <map>
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 #include "json/value.h"
 
-using namespace std;
+using std::string;
+using std::map;
 
 class MenuRenderer;
 
-namespace Widgets {
+//#include "menuengine.h"
 
-class IEngine
-{
-public:
-	IEngine();
-	virtual ~IEngine();
+//#include "abstractengine.h"
+//#include "dispatchengine.h"
 
-	virtual void Run() = 0;
-	virtual void onItemSelect(string item) = 0;
-	virtual void onMenuKeyPress(string key, string &selected) = 0;
-	virtual void onNextMenuRequest() = 0;
-	virtual void onPreviousMenuRequest() = 0;
-
-protected:
-	MenuRenderer *menuRenderer;
-	int _current;
-};
-
-class Menu;
-class Engine : IEngine
-{
-public:
-	Engine();
-	~Engine();
-	void addMenu(Menu);
-	Json::Value toJson();
-	void Run();
-
-	// events
-	void onItemSelect(string item);
-	/**
-	 * Key press event in MenuRenderer is received in this handler.
-	 *
-	 *  @param &selected reference to the string the succesfully selected item's key 
-	 *  can be stored in. the MenuRenderer will use it to update its menu.
-	 */
-	void onMenuKeyPress(string key, string &selected);
-	void onNextMenuRequest();
-	void onPreviousMenuRequest();
-
-private:
-
-	map <string, Menu> menus;
-	map <string, Menu>::iterator menuIterator;
-
-	int activeMenuIndex;
-	Menu *activeMenu;
-};
-
-class Widget;
-class DispatchEngine : public IEngine
-{
-public:
-	DispatchEngine(Widget *);
-	~DispatchEngine();
-	void Run();
-
-	void onItemSelect(string item);
-	void onMenuKeyPress(string key, string &selected);
-	void onNextMenuRequest();
-	void onPreviousMenuRequest();
-
-private:
-	Widget *activeWidget;
-};
-
+class MenuEngine;
 class Widget
 {
 public:
@@ -100,8 +44,8 @@ public:
 
 	virtual void execute() = 0;
 
-	void setEngine(Engine *);
-	Engine *getEngine();
+	void setEngine(MenuEngine *);
+	MenuEngine *getEngine();
 	
 private:
 
@@ -109,7 +53,7 @@ private:
 	string type;
 
 protected:
-	Engine *engine;
+	MenuEngine *engine_;
 };
 
 class Null : public Widget
@@ -139,41 +83,7 @@ public:
 
 };
 	
-#include "CObjectMap.h"
-typedef CObjectMap<string, Widget> ItemsMap;
-typedef ItemsMap::ObjectMapI ItemsMapI;
-
-class Menu : public Widget
-{
-public:
-
-	Menu(); 
-	Menu(string name); 
-
-	void addItem(Widget *);
-	Json::Value toJson();
-	string getName();
-	string getValue() { return "Menu::NullValue"; };
-	map <string, string> getItems();
-	Widget *getWidget(string key);
-	void executeWidget(string key);
-	void execute();
-
-private:
-	void _initialize();
-
-	string type;
-	string name;
-	
-	ItemsMap items;
-	ItemsMapI itemIterator;
-	
-	//CObjectMap<string, Widget> items;
-	//CObjectMap<string, Widget>::iterator itemIterator;
-
-	int _current;
-
-};
+#include "menu.h"
 
 class File : public Widget
 {
@@ -213,6 +123,4 @@ private:
 	
 };
 
-
-};
-#endif
+#endif //__WIDGETS_H__

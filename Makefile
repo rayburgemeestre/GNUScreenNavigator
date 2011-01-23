@@ -1,7 +1,7 @@
 CC		= g++
 CFLAGS	= -O2 -g -Wall -funsigned-char -I lib/jsoncpp-src-0.5.0/include/ 
 LFLAGS	= -lm -L lib/jsoncpp-src-0.5.0/libs/ -ljson -lncurses -lmenu
-OBJ		= widgets.o parser.o menu_renderer.o
+OBJ		= widgets.o launcher.o menurenderer.o abstractengine.o menuengine.o dispatchengine.o
 BIN		= launcher
 
 all:		launcher
@@ -18,14 +18,23 @@ install:
 clean:
 			rm -f *.o
 
+abstractengine.o:		src/abstractengine.cpp
+	$(CC) $(CFLAGS) -c src/abstractengine.cpp
+
+menuengine.o:		src/menuengine.cpp
+	$(CC) $(CFLAGS) -c src/menuengine.cpp
+
+dispatchengine.o:		src/dispatchengine.cpp
+	$(CC) $(CFLAGS) -c src/dispatchengine.cpp
+
 widgets.o:		src/widgets.cpp
 	$(CC) $(CFLAGS) -c src/widgets.cpp
 
-parser.o:		src/parser.cpp
-	$(CC) $(CFLAGS) -c src/parser.cpp
+launcher.o:		src/launcher.cpp
+	$(CC) $(CFLAGS) -c src/launcher.cpp
 
-menu_renderer.o:		src/menu_renderer.cpp
-	$(CC) $(CFLAGS) -c src/menu_renderer.cpp
+menurenderer.o:		src/menurenderer.cpp
+	$(CC) $(CFLAGS) -c src/menurenderer.cpp
 	
 launcher:	$(OBJ)
 	$(CC) $(CFLAGS) -o $(BIN) $(OBJ) $(LFLAGS)

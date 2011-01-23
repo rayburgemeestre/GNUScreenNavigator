@@ -4,260 +4,11 @@
 #include <assert.h>
 
 #include "widgets.h"
-#include "menu_renderer.h"
+#include "menurenderer.h"
+#include "menuengine.h"
+#include "dispatchengine.h"
 
 using namespace std;
-
-namespace Widgets {
-
-
-IEngine::IEngine()
-{
-	_current = 0;
-	menuRenderer = new MenuRenderer;
-}
-
-IEngine::~IEngine()
-{
-	delete menuRenderer;
-}
-
-
-Engine::Engine()
-{
-	activeMenu = NULL;
-	activeMenuIndex = 0;
-}
-
-Engine::~Engine()
-{
-	activeMenu = NULL;
-}
-	
-void Engine::addMenu(Menu menu)
-{
-	char num[64] = "";
-	sprintf(num, "%d", _current++);
-	
-	menu.setEngine(this);
-	menus[num] = menu;
-
-	return;
-}
-
-void Engine::Run()
-{
-	assert(menus.size() > 0);
-	assert(menus.size() > (unsigned int)activeMenuIndex);
-	
-	char buffer[64];
-	sprintf(buffer, "%d", activeMenuIndex);
-	activeMenu = &menus[buffer];
-
-	menuRenderer->setEngine(this);
-	menuRenderer->setMenuName(activeMenu->getName());
-	menuRenderer->resetMenuItems();
-	
-	// set items as strings
-	map <string, string> items = activeMenu->getItems();
-	map <string, string>::iterator iter;
-	for (
-		iter = items.begin();
-		iter != items.end();
-		iter++
-	) {
-		menuRenderer->addMenuItem(iter->first, iter->second);
-	}
-
-	menuRenderer->Render();
-}
-
-void Engine::onNextMenuRequest()
-{
-	activeMenuIndex++;
-
-	if (menus.size() == (unsigned int)activeMenuIndex) {
-		activeMenuIndex = 0;
-	}
-
-	Run();
-}
-
-void Engine::onPreviousMenuRequest()
-{
-	activeMenuIndex--;
-
-	if (activeMenuIndex < 0) {
-		activeMenuIndex = menus.size() - 1;
-	}
-
-	Run();
-}
-
-void Engine::onItemSelect(string item)
-{
-	// Send execute to menu
-	activeMenu->executeWidget(item);
-}
-
-void Engine::onMenuKeyPress(string key, string &selected)
-{
-	Widget *widget = activeMenu->getWidget(key);
-
-	if (widget != NULL) {
-		selected = widget->getParentKey();
-	} else {
-		selected = "";
-	}
-}
-
-Json::Value Engine::toJson()
-{
-	Json::Value root;
-
-	for (
-		menuIterator = menus.begin(); 
-		menuIterator != menus.end(); 
-		menuIterator++
-	) {
-		root[menuIterator->first] = (menuIterator->second).toJson();
-	}
-
-	return root;
-}
-
-
-
-DispatchEngine::DispatchEngine(Widget *widget)
-{
-	activeWidget = widget;
-}
-
-DispatchEngine::~DispatchEngine()
-{
-}
-void DispatchEngine::Run()
-{
-	assert(activeWidget != NULL);
-
-	menuRenderer->setEngine(this);
-	menuRenderer->setMenuName("Dispatch selected file");
-	menuRenderer->setFastItemSelect(true);
-	
-	// set items as strings
-	menuRenderer->addMenuItem("v", "vim, VI-Improved v7.0 in new screen window");
-	menuRenderer->addMenuItem("s", "vim+sudo, VI-Improved v7.0 ,, + root priv.");
-	menuRenderer->addMenuItem("t", "tail, tail -f <file>");
-	menuRenderer->addMenuItem("p", "pico editor in new screen window");
-	menuRenderer->addMenuItem("c", "cat, show file contents, exit on keypress");
-	menuRenderer->addMenuItem("x", "urxvt + vim + desert256 outside non256color screen in windows using xming");
-	menuRenderer->addMenuItem("m", "sendmail to ray@grecom.nl");
-	menuRenderer->addMenuItem("n", "sendmail to marijn@grecom.nl");
-	menuRenderer->addMenuItem("o", "sendmail to trigen_@hotmail.com");
-
-	menuRenderer->Render();
-}
-
-void DispatchEngine::onNextMenuRequest()
-{
-}
-
-void DispatchEngine::onPreviousMenuRequest()
-{
-}
-
-void DispatchEngine::onItemSelect(string item)
-{
-	string editorName;
-	string editorParams;
-
-	if (item == "v") {
-		editorName = "vim";
-		editorParams = "-T xterm-256color";
-	}
-    else if (item == "s") {
-		editorName = "sudo vim";
-		editorParams = "-T xterm-256color";
-	}
-    else if (item == "t") {
-		editorName = "tail";
-		editorParams = "-f";
-	}
-	else if (item == "p") {
-		editorName = "pico";
-		editorParams = "";
-	}
-	else if (item == "c") {
-		editorName = "cat";
-		editorParams = "";
-	}
-    else if (item == "x") {
-        editorName = "urxvt";
-        editorParams = "-e vim";
-    }
-    else if (item == "m") {
-        editorName = "sendFileTo.sh";
-        editorParams = "  ray@grecom.nl";
-    }
-    else if (item == "n") {
-        editorName = "sendFileTo.sh";
-        editorParams = " marijn@grecom.nl";
-    }
-    else if (item == "o") {
-        editorName = "sendFileTo.sh";
-        editorParams = " trigen_@hotmail.com";
-    }
-	else {
-		return;
-	}
-
-	ofstream myfile;
-	string fileName = activeWidget->getValue();
-	string bufferName = editorName;
-	string directoryName = "~/";
-	string::size_type pos = fileName.find_last_of('/', fileName.length());
-	if (pos != string::npos) {
-		bufferName = editorName + ":" + fileName.substr(pos + 1);
-		directoryName = fileName.substr(0, pos);
-	}
-
-	myfile.open ("/tmp/edit.sh", ios::trunc);
-	myfile << "#!/bin/bash\n";
-	myfile << "cd " << directoryName << " && ";
-	myfile << editorName + " " + editorParams + " " << fileName << "\n";
-	myfile.close();
-	// Chmod script
-	system("chmod +x /tmp/edit.sh");
-
-	string cmd = "screen -t " + bufferName + " /tmp/edit.sh ";
-
-	system(cmd.c_str());
-}
-
-void DispatchEngine::onMenuKeyPress(string key, string &selected)
-{
-	if (key == "v" || 
-		key == "p" ||
-		key == "c" ||
-		key == "t" ||
-		key == "s" ||
-		key == "x" ||
-		key == "m" ||
-		key == "n" ||
-		key == "o"
-	) {
-		selected = key;
-
-	}
-	else { 
-		selected = "";
-	}
-}
-
-
-
-
-
 
 
 Widget::Widget()
@@ -270,16 +21,15 @@ Widget::~Widget()
 {
 }
 
-
-void Widget::setEngine(Engine *nEngine)
+void Widget::setEngine(MenuEngine *engine)
 {
-	engine = nEngine;
+	engine_ = engine;
 }
 
 
-Engine * Widget::getEngine()
+MenuEngine * Widget::getEngine()
 {
-	return engine;
+	return engine_;
 }
 
 
@@ -288,19 +38,19 @@ Menu::Menu()
 { 
 	name = "Menu";
 
-	_initialize();
+	initialize();
 }
 
 Menu::Menu(string menuName)
 {
 	name = menuName;
 
-	_initialize();
+	initialize();
 }
 
-void Menu::_initialize()
+void Menu::initialize()
 {
-	_current = 0; 
+	current_ = 0; 
 }
 
 void Menu::addItem(Widget *widget)
@@ -309,19 +59,19 @@ void Menu::addItem(Widget *widget)
 	string availableKeys = "abcdefgimnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 	int numAvailableKeys = availableKeys.length();
 	
-	if (_current >= numAvailableKeys) {
+	if (current_ >= numAvailableKeys) {
 		return;
 	}
 
 	char num[2];
-	num[0] = availableKeys.at(_current);
+	num[0] = availableKeys.at(current_);
 	num[1] = '\0';
 
-	_current++;
+	current_++;
 
 	//items[num] = widget;
 	widget->setParentKey(num);
-	widget->setEngine(engine);
+	widget->setEngine(engine_);
 	items.Add(num, widget);
 }
 
@@ -343,9 +93,9 @@ void Menu::executeWidget(string key)
 {
 	Widget *widget = getWidget(key);
 	assert(widget != NULL);
-	assert(engine != NULL);
+	assert(engine_ != NULL);
 
-	widget->setEngine(engine);
+	widget->setEngine(engine_);
 	widget->execute();
 }
 
@@ -495,4 +245,3 @@ void Dir::execute()
 	system(cmd.c_str());
 }
 
-}
