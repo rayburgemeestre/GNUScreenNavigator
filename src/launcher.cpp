@@ -44,7 +44,8 @@ string get_config()
 
 //apt-get install libncurses5-dev
 
-#include "widgets.h"
+#include "widgets/file.h"
+#include "widgets/dir.h"
 #include "menuengine.h"
 
 int main(int argc, char *argv[])

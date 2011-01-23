@@ -1,6 +1,4 @@
 #include "abstractengine.h"
-
-#include "abstractengine.h"
 #include "menurenderer.h"
 
 AbstractEngine::AbstractEngine()
@@ -13,4 +11,3 @@ AbstractEngine::~AbstractEngine()
 {
 	delete menuRenderer_;
 }
-

@@ -1,25 +1,18 @@
-#ifndef __WIDGETS_H__
-#define __WIDGETS_H__
-#include <string>
-#include <map>
+#ifndef __WIDGET_H__
+#define __WIDGET_H__
 
 #include <iostream>
+#include <string>
+#include <map>
 using std::cout;
 using std::endl;
-
-#include "json/value.h"
-
 using std::string;
 using std::map;
 
-class MenuRenderer;
-
-//#include "menuengine.h"
-
-//#include "abstractengine.h"
-//#include "dispatchengine.h"
+#include "json/value.h"
 
 class MenuEngine;
+
 class Widget
 {
 public:
@@ -83,44 +76,5 @@ public:
 
 };
 	
-#include "menu.h"
 
-class File : public Widget
-{
-public: 
-	File();
-	File(string);
-	Json::Value toJson();
-
-	string getName();
-	string getFileName();
-	string getValue();
-	void execute();
-
-private:
-
-	string name;
-	string fileName;
-	
-};
-
-class Dir : public Widget
-{
-public: 
-	Dir();
-	Dir(string);
-	Json::Value toJson();
-
-	string getName();
-	string getDirectoryName();
-	string getValue();
-	void execute();
-
-private:
-
-	string name;
-	string directoryName;
-	
-};
-
-#endif //__WIDGETS_H__
+#endif //__WIDGET_H__

@@ -10,7 +10,7 @@ using std::map;
 #include "abstractengine.h"
 #include "json/value.h"
 
-#include "menu.h"
+#include "widgets/menu.h"
 
 class MenuEngine : AbstractEngine
 {

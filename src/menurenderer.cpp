@@ -3,7 +3,6 @@
 #include <cstring>
 #include <cassert>
 
-
 #define STATE_WAITING 0
 #define STATE_ACTION_MODE 1
 #define STATE_NEXT_MENU_REQUEST 2

@@ -1,7 +1,6 @@
 #ifndef __MENU_RENDERER_H
 #define  __MENU_RENDERER_H
 #include <stdlib.h>
-#include <menu.h>
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #define CTRLD 	4
@@ -11,7 +10,7 @@
 #include <map>
 #include <assert.h>
 
-#include "widgets.h"
+#include "widgets/menu.h"
 
 using namespace std;
 
@@ -21,6 +20,10 @@ using namespace std;
 #define COLORS_MENU_HEADER_BACKGROUND 4
 
 class AbstractEngine;
+
+// ncurses
+#include <ncurses.h>
+#include <menu.h>
 
 class MenuRenderer
 {
